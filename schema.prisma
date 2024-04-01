@@ -5,23 +5,6 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DB_URL")
-  
-}
-
-
-
-
-Based on your requirements, here's a revised Prisma schema that reflects the structure you described:
-
-prisma
-Copy code
-generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DB_URL")
 }
 
 // Table one: Users
@@ -37,46 +20,7 @@ model User {
   imageId      String?   @db.VarChar(255)
   imageUrl     String?   @db.VarChar(255)
 
-  posts        Post[]    @relation("user_posts")
-  likes        Like[]    @relation("user_likes")
-  saves        Save[]    @relation("user_saves")
-}
-
-model Post {
-  post_id      String    @id @default(uuid())
-  caption      String
-  tags         String[]
-  imageId      String?   @db.VarChar(255)
-  imageUrl     String?   @db.VarChar(255)
-  created_at   DateTime  @default(now())
-  updated_at   DateTime  @updatedAt
-
-  creator      User      @relation("user_posts", fields: [creatorId], references: [user_id])
-  creatorId    String
-
-  likes        Like[]    @relation("post_likes")
 }
 
 
-model Save {
-  save_id      String    @id @default(uuid())
-  created_at   DateTime  @default(now())
 
-  user         User      @relation("user_saves", fields: [userId], references: [user_id])
-  userId       String
-
-  post         Post      @relation(fields: [postId], references: [post_id])
-  postId       String
-}
-
-
-model Like {
-  like_id      String    @id @default(uuid())
-  created_at   DateTime  @default(now())
-
-  user         User      @relation("user_likes", fields: [userId], references: [user_id])
-  userId       String
-
-  post         Post      @relation("post_likes", fields: [postId], references: [post_id])
-  postId       String
-}

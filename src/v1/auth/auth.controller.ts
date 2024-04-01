@@ -50,14 +50,13 @@ export class AuthController {
     }
 
     const userCreated = await this.authServices.creatUser(userCreatDTO);
-    const token = await this.authServices.generateToken(userCreated.user_id);
-    return { access_token: token };
+    return userCreated;
   }
 
-  // @Get("auth-check")
-  // async checkUser (@Headers('authorization') authorizationHeader: string){
-  //   return this.authServices.getUserWithToken(authorizationHeader)
-  // }
+  @Get("auth-check")
+  async checkUser (@Headers('authorization') authorizationHeader: string){
+    return this.authServices.getUserWithToken(authorizationHeader)
+  }
 
 
 }

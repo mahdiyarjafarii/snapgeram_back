@@ -17,7 +17,6 @@ interface payloadJWT {
 export class AuthService {
   constructor(
     private readonly prismaService: PrismaService,
-    @Inject('REDIS_CLIENT') private readonly redisClient: Redis,
   ) {}
 
   async creatUser({
@@ -30,7 +29,7 @@ export class AuthService {
 
     try {
       const passwordHash = await bcrypt.hash(password, process.env.SALT_BCRYPT);
-      const createduser = await this.prismaService.users.create({
+      const createduser = await this.prismaService.user.create({
         data: {
           name,
           userName,
@@ -46,7 +45,7 @@ export class AuthService {
   }
 
   async findeByEmail(email: string): Promise<UserEntity | undefined> {
-    return this.prismaService.users.findFirst({
+    return this.prismaService.user.findFirst({
       where: {
         email: email,
       },
@@ -60,6 +59,34 @@ export class AuthService {
       expiresIn: 81000,
     });
     return token;
+  }
+
+  async getUserWithToken(token: string): Promise<UserEntity | undefined> {
+    try {
+      const payload = (await jwt.verify(
+        token,
+        process.env.JWT_SECRET,
+      )) as payloadJWT;
+      if (!payload) {
+        return null;
+      }
+      const user = await this.prismaService.user.findUnique({
+        where: {
+          user_id: payload.userId,
+        },
+      });
+
+      if (!user) return null;
+
+      return{
+        ...user,
+        isAuthenticated:true
+      } 
+      
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
   }
 
   // async setTokenRedis(key: string, token: string ,timeExpire:number): Promise<string> {
