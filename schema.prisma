@@ -19,8 +19,33 @@ model User {
   bio          String?   @db.VarChar(255)
   imageId      String?   @db.VarChar(255)
   imageUrl     String?   @db.VarChar(255)
+  posts        Post[]
+  liked_posts   Like[]
 
 }
+
+
+
+model Post {
+  post_id     String    @id @default(uuid())
+  creator      User        @relation(fields: [creator_id], references: [user_id])
+  creator_id   String
+  caption      String    @db.VarChar(255)
+  tags         String[]
+  imageId      String?   @db.VarChar(255)
+  imageUrl     String?   @db.VarChar(255)
+   likes       Like[] 
+}
+
+
+model Like {
+  id             String      @id @default(uuid())
+  user           User        @relation(fields: [user_id], references: [user_id])
+  user_id        String
+  post           Post        @relation(fields: [post_id], references: [post_id])
+  post_id        String
+}
+
 
 
 
