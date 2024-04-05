@@ -1,15 +1,38 @@
-export class UserCreateReq{
+import {IsEmail , IsOptional, IsString, MinLength } from 'class-validator';
+
+export class PostCreateReq{
     @IsString()
-    name: string;
+    caption: string;
 
     @IsString()
-    userName : string;
-
-    @IsEmail()
-    email :string
+    location : string;
 
     @IsString()
-    @MinLength(8)
-    password:string
+    creator_id : string;
+    
+    @IsString()
+    tags : string[];
+
+    image : any;
+
+
+}
+
+export class PostCreateReqInDB{
+    @IsString()
+    caption: string;
+
+    @IsString()
+    location : string;
+
+    @IsString()
+    creator_id : string;
+    
+    @IsString()
+    tags : string[];
+
+    @IsOptional()
+    imageUrl? : any;
+
 
 }

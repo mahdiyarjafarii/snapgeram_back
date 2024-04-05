@@ -10,7 +10,8 @@ import { PostModule } from './v1/post/post.module';
   imports: [
     PrismaModule,
     AuthModule,
-    PostModule
+    PostModule,
+    
     ],
   controllers: [AppController],
   providers: [AppService],

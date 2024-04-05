@@ -32,6 +32,7 @@ model Post {
   creator_id   String
   caption      String    @db.VarChar(255)
   tags         String[]
+  location     String
   imageId      String?   @db.VarChar(255)
   imageUrl     String?   @db.VarChar(255)
    likes       Like[] 

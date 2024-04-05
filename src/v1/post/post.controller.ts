@@ -1,5 +1,11 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { PostService } from './post.service';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import * as multer from 'multer';
+import { cwd } from 'process';
+import { existsSync, mkdirSync, renameSync } from 'fs';
+import { PostCreateReq } from './dtos/post.dto';
+
 
 @Controller(
     {
@@ -8,10 +14,54 @@ import { PostService } from './post.service';
       }
 )
 export class PostController {
-  constructor(private readonly appService: PostService) {}
+  constructor(private readonly postService: PostService) {}
 
   @Post('/create')
-  getHello(): string {
-    return this.appService.getHello();
+  @UseInterceptors(
+    FilesInterceptor('image', 7, {
+      storage: multer.diskStorage({
+        destination: function (req, file, cb) {
+          const destinationPath = `${cwd()}/uploads/tmp`;
+  
+          if (!existsSync(destinationPath)) {
+            try {
+              mkdirSync(destinationPath, { recursive: true }); // Ensure parent directories are created
+            } catch (err) {
+              return cb(err);
+            }
+          }
+  
+          cb(null, destinationPath);
+        },
+        filename: function (req, file, cb) {
+          cb(null, file.originalname);
+        },
+      }),
+    }),
+  )
+  async createPost
+  (
+    @UploadedFiles() image: any,
+    @Body() postDTO: PostCreateReq
+  ) {
+
+    const dbRes = await this.postService.createPostService({
+      creator_id:postDTO.creator_id,
+      caption:postDTO.caption,
+      tags:postDTO.tags,
+      location:postDTO.location,
+    });
+    console.log(dbRes)
+
+
+
+    if (image?.length) {
+      renameSync(`${cwd()}/uploads/tmp`, `${cwd()}/uploads/${dbRes.post_id}`);
+       let dbResFinal= this.postService.writeImagePathToDB({
+        imageUrl:`http://localhost:3001/uploads/${dbRes.post_id}/${image[0].originalname}`,
+        post_id:dbRes.post_id
+      })
+      return dbResFinal;
+    }
   }
 }
