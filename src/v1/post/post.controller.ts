@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { PostService } from './post.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
@@ -15,6 +15,15 @@ import { PostCreateReq } from './dtos/post.dto';
 )
 export class PostController {
   constructor(private readonly postService: PostService) {}
+
+
+
+  @Get('/')
+  async getAllPost(
+    @Query("limit") limit?: number,
+  ){
+    return await this.postService.getAllPost(limit);
+  }
 
   @Post('/create')
   @UseInterceptors(
@@ -51,8 +60,6 @@ export class PostController {
       tags:postDTO.tags,
       location:postDTO.location,
     });
-    console.log(dbRes)
-
 
 
     if (image?.length) {

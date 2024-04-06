@@ -35,6 +35,8 @@ model Post {
   location     String
   imageId      String?   @db.VarChar(255)
   imageUrl     String?   @db.VarChar(255)
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
    likes       Like[] 
 }
 

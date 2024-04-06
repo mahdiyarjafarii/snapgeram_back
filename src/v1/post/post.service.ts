@@ -43,5 +43,27 @@ export class PostService {
     throw error; 
   }
 }
+
+async getAllPost(
+  limit ?:number,
+){
+  try{
+    const posts=this.prismaService.post.findMany({
+      take:+limit,
+      orderBy:{
+        created_at: 'desc',
+      }, 
+       include: {
+        creator: true, 
+      },
+    })
+    return posts
+
+  }catch(error){
+    console.log(error);
+    throw error
+  }
+
+}
 }
 
