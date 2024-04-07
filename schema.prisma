@@ -19,8 +19,9 @@ model User {
   bio          String?   @db.VarChar(255)
   imageId      String?   @db.VarChar(255)
   imageUrl     String?   @db.VarChar(255)
-  posts        Post[]
+  posts         Post[]
   liked_posts   Like[]
+  saved_posts   Save[]
 
 }
 
@@ -37,11 +38,19 @@ model Post {
   imageUrl     String?   @db.VarChar(255)
   created_at   DateTime  @default(now())
   updated_at   DateTime  @updatedAt
-   likes       Like[] 
+  likes       Like[] 
+  saves       Save[]
 }
 
 
 model Like {
+  id             String      @id @default(uuid())
+  user           User        @relation(fields: [user_id], references: [user_id])
+  user_id        String
+  post           Post        @relation(fields: [post_id], references: [post_id])
+  post_id        String
+}
+model Save {
   id             String      @id @default(uuid())
   user           User        @relation(fields: [user_id], references: [user_id])
   user_id        String

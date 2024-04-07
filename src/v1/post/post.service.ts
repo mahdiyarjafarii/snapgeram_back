@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/infrastructure/prisma/prisma.service';
-import { PostCreateReqInDB } from './dtos/post.dto';
+import { PostCreateReqInDB, PostLikedReq, PostSavedReq } from './dtos/post.dto';
 
 @Injectable()
 export class PostService {
@@ -65,5 +65,71 @@ async getAllPost(
   }
 
 }
+
+async likePostCreated({UserId,postId}:PostLikedReq){
+  try{
+    const likedPost=await this.prismaService.like.create({
+      data:{
+        user_id:UserId,
+        post_id:postId
+      }
+    });
+    return likedPost
+
+  }catch(error){
+    console.log(error);
+    throw error
+  }
+
+};
+
+async deleteLikedPost({ userId, postId }: { userId: string; postId: string }) {
+  try {
+    const deletedLike = await this.prismaService.like.deleteMany({
+      where: {
+        user_id: userId,
+        post_id: postId
+      }
+    });
+    return deletedLike;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+
+async savedPostCreated({UserId,postId}:PostSavedReq){
+  try{
+    const savedPost=await this.prismaService.save.create({
+      data:{
+        user_id:UserId,
+        post_id:postId
+      }
+    });
+    return savedPost
+
+  }catch(error){
+    console.log(error);
+    throw error
+  }
+
+};
+
+
+async deleteSavedPost({ userId, postId }: { userId: string; postId: string }) {
+  try {
+    const deletedSave = await this.prismaService.save.deleteMany({
+      where: {
+        user_id: userId,
+        post_id: postId
+      }
+    });
+    return deletedSave;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
 }
 

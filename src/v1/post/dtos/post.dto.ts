@@ -36,3 +36,19 @@ export class PostCreateReqInDB{
 
 
 }
+
+export class PostLikedReq{
+    @IsString()
+    UserId: string;
+
+    @IsString()
+    postId : string;
+}
+
+export class PostSavedReq{
+    @IsString()
+    UserId: string;
+
+    @IsString()
+    postId : string;
+}

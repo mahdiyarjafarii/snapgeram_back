@@ -4,7 +4,7 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { cwd } from 'process';
 import { existsSync, mkdirSync, renameSync } from 'fs';
-import { PostCreateReq } from './dtos/post.dto';
+import { PostCreateReq, PostLikedReq, PostSavedReq } from './dtos/post.dto';
 
 
 @Controller(
@@ -24,6 +24,38 @@ export class PostController {
   ){
     return await this.postService.getAllPost(limit);
   }
+
+  @Post('/like')
+  async likePost(
+    @Body() likePostDTO: PostLikedReq
+  ){
+    return await this.postService.likePostCreated(likePostDTO);
+  };
+
+
+  @Post('/like/delete')
+    async deleteLikedPost(
+  @Body() deleteLikeDTO: { userId: string; postId: string }
+) {
+  return await this.postService.deleteLikedPost(deleteLikeDTO);
+}
+
+  @Post('/save')
+  async savePost(
+    @Body() likePostDTO: PostSavedReq
+  ){
+    return await this.postService.savedPostCreated(likePostDTO);
+  };
+
+  
+@Post('/save/delete')
+async deleteSavedPost(
+  @Body() deleteSaveDTO: { userId: string; postId: string }
+) {
+  return await this.postService.deleteSavedPost(deleteSaveDTO);
+}
+
+
 
   @Post('/create')
   @UseInterceptors(
@@ -48,8 +80,7 @@ export class PostController {
       }),
     }),
   )
-  async createPost
-  (
+  async createPost (
     @UploadedFiles() image: any,
     @Body() postDTO: PostCreateReq
   ) {
