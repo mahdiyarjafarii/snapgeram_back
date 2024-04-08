@@ -31,6 +31,37 @@ export class PostService {
 
  }
 
+ async updatePostServices(  {
+  caption,
+  tags,
+  location,
+  imageUrl,
+  post_id
+} :{
+  caption:string,
+  tags:any,
+  location:string,
+  imageUrl?:string,
+  post_id:string
+}){
+  try{
+    const updatedPost = await this.prismaService.post.update({
+      where: {
+        post_id
+      },
+      data: {
+        caption,
+        tags:["tehran"],
+        location,
+        imageUrl
+      },
+    });
+    return updatedPost;
+  }catch(error){
+    console.log
+  }
+ }
+
  async writeImagePathToDB({ imageUrl, post_id }: { imageUrl: string; post_id: string }) {
   try {
     const updatedPost = await this.prismaService.post.update({
@@ -55,6 +86,8 @@ async getAllPost(
       }, 
        include: {
         creator: true, 
+        likes:true,
+        saves:true
       },
     })
     return posts
@@ -66,11 +99,11 @@ async getAllPost(
 
 }
 
-async likePostCreated({UserId,postId}:PostLikedReq){
+async likePostCreated({userId,postId}:PostLikedReq){
   try{
     const likedPost=await this.prismaService.like.create({
       data:{
-        user_id:UserId,
+        user_id:userId,
         post_id:postId
       }
     });
@@ -99,11 +132,11 @@ async deleteLikedPost({ userId, postId }: { userId: string; postId: string }) {
 }
 
 
-async savedPostCreated({UserId,postId}:PostSavedReq){
+async savedPostCreated({userId,postId}:PostSavedReq){
   try{
     const savedPost=await this.prismaService.save.create({
       data:{
-        user_id:UserId,
+        user_id:userId,
         post_id:postId
       }
     });
@@ -131,5 +164,20 @@ async deleteSavedPost({ userId, postId }: { userId: string; postId: string }) {
     throw error;
   }
 };
+
+async getPostByIDService (postId:string){
+  try{
+    const post= await this.prismaService.post.findUnique({
+      where:{
+        post_id:postId
+      }
+    });
+    return post;
+
+  }catch(error){
+    console.log(error);
+    throw error
+  }
+}
 }
 

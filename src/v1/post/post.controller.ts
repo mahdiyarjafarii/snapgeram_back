@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Post, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { PostService } from './post.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { cwd } from 'process';
-import { existsSync, mkdirSync, renameSync } from 'fs';
-import { PostCreateReq, PostLikedReq, PostSavedReq } from './dtos/post.dto';
+import { existsSync, mkdirSync, readdirSync, renameSync, unlinkSync } from 'fs';
+import { PostCreateReq, PostLikedReq, PostSavedReq, PostUpdateReq } from './dtos/post.dto';
+import { readdir, unlink } from 'fs/promises';
 
 
 @Controller(
@@ -24,6 +25,15 @@ export class PostController {
   ){
     return await this.postService.getAllPost(limit);
   }
+
+  @Get(':id')
+  async getProductByID(
+    @Param('id') id: string,
+  ) {
+    return await this.postService.getPostByIDService(id);
+  }
+
+  
 
   @Post('/like')
   async likePost(
@@ -102,4 +112,99 @@ async deleteSavedPost(
       return dbResFinal;
     }
   }
+
+  @Post('/update')
+  @UseInterceptors(
+    FilesInterceptor('image', 1, {
+      storage: multer.diskStorage({
+        destination: function (req, file, cb) {
+          const destinationPath = `${cwd()}/uploads/tmp`;
+
+          if (!existsSync(destinationPath)) {
+            try {
+              mkdirSync(destinationPath, { recursive: true }); // Ensure parent directories are created
+            } catch (err) {
+              return cb(err);
+            }
+          }
+
+          cb(null, destinationPath);
+        },
+        filename: function (req, file, cb) {
+          cb(null, file.originalname);
+        },
+      }),
+    }),
+  )
+  async updatePost(
+    @UploadedFiles() newImage: any,
+    @Body() postDTO: PostUpdateReq
+  ) {
+    if(newImage?.length){
+     const directoryPath = `${cwd()}/uploads/${postDTO.post_id}`;
+     const files = readdirSync(directoryPath);
+     const fileName = files[0]; 
+     const oldImagePath = `${cwd()}/uploads/${postDTO.post_id}/${fileName}`;
+ 
+     
+     if(fileName !== newImage[0].originalname){
+     
+      if (existsSync(oldImagePath)) {
+        // Move the old image to an archive folder
+        const archiveFolderPath = `${cwd()}/uploads/archive`;
+        if (!existsSync(archiveFolderPath)) {
+          mkdirSync(archiveFolderPath, { recursive: true });
+        }
+        const archivedImagePath = `${archiveFolderPath}/${postDTO.post_id}`;
+        renameSync(`${cwd()}/uploads/${postDTO.post_id}`, archivedImagePath);
+      };
+      renameSync(`${cwd()}/uploads/tmp`, `${cwd()}/uploads/${postDTO.post_id}`);
+      const updatedPost=await this.postService.updatePostServices({
+        post_id:postDTO.post_id,
+        caption:postDTO.caption,
+        tags:postDTO.tags,
+        imageUrl: `http://localhost:3001/uploads/${postDTO.post_id}/${newImage[0].originalname}`,
+        location:postDTO.location
+      })
+      return updatedPost;
+
+     }else{
+      const tempDirPath = `${cwd()}/uploads/tmp`;
+      if (existsSync(tempDirPath)) {
+        try {
+          await unlink(tempDirPath);
+        } catch (error) {
+          console.error(error);
+          throw new Error("Failed to delete temporary directory.");
+        }
+      }
+
+      const updatedPost=await this.postService.updatePostServices({
+        post_id:postDTO.post_id,
+        caption:postDTO.caption,
+        tags:postDTO.tags,
+        location:postDTO.location
+      });
+      
+      return updatedPost;
+
+     }
+
+
+
+
+
+    }else{
+      const updatedPost=await this.postService.updatePostServices({
+        post_id:postDTO.post_id,
+        caption:postDTO.caption,
+        tags:postDTO.tags,
+        location:postDTO.location
+      });
+      return updatedPost
+
+    }
+
+  }
+
 }

@@ -16,7 +16,28 @@ export class PostCreateReq{
     image : any;
 
 
+};
+
+export class PostUpdateReq{
+    @IsString()
+    caption: string;
+
+    @IsString()
+    location : string;
+
+    @IsString()
+    post_id : string;
+    
+    @IsString()
+    tags : string[];
+    @IsString()
+    imageUrl?: string;
+
+    image : any;
+
+
 }
+
 
 export class PostCreateReqInDB{
     @IsString()
@@ -39,7 +60,7 @@ export class PostCreateReqInDB{
 
 export class PostLikedReq{
     @IsString()
-    UserId: string;
+    userId: string;
 
     @IsString()
     postId : string;
@@ -47,7 +68,7 @@ export class PostLikedReq{
 
 export class PostSavedReq{
     @IsString()
-    UserId: string;
+    userId: string;
 
     @IsString()
     postId : string;

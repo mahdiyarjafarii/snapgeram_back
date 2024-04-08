@@ -74,6 +74,10 @@ export class AuthService {
         where: {
           user_id: payload.userId,
         },
+        include:{
+          saved_posts:true,
+          liked_posts:true
+        }
       });
 
       if (!user) return null;
