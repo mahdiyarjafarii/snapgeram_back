@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { PostService } from './post.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
@@ -33,6 +33,13 @@ export class PostController {
     return await this.postService.getPostByIDService(id);
   }
 
+  
+  @Delete(':id')
+  async deletePostById(
+    @Param('id') id: string,
+  ){
+    return await this.postService.deletePostByIdService(id)
+  }
   
 
   @Post('/like')

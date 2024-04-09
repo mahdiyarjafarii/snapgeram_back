@@ -170,6 +170,10 @@ async getPostByIDService (postId:string){
     const post= await this.prismaService.post.findUnique({
       where:{
         post_id:postId
+      },
+      include:{
+        creator:true,
+        likes:true
       }
     });
     return post;
@@ -178,6 +182,38 @@ async getPostByIDService (postId:string){
     console.log(error);
     throw error
   }
+}
+
+async deletePostByIdService(postId:string){
+
+  try{
+    await this.prismaService.like.deleteMany({
+      where: {
+        post_id: postId
+      }
+    });
+
+    // Delete associated saves
+    await this.prismaService.save.deleteMany({
+      where: {
+        post_id: postId
+      }
+    });
+
+    // Finally, delete the post itself
+    const deletedPost = await this.prismaService.post.delete({
+      where: {
+        post_id: postId
+      }
+    });
+
+    return deletedPost;
+
+  }catch(error){
+    console.log(error);
+    throw error
+  }
+
 }
 }
 
