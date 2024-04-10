@@ -22,8 +22,9 @@ export class PostController {
   @Get('/')
   async getAllPost(
     @Query("limit") limit?: number,
+    @Query("searchTerm") searchTerm?: string,
   ){
-    return await this.postService.getAllPost(limit);
+    return await this.postService.getAllPost(limit,searchTerm);
   }
 
   @Get(':id')

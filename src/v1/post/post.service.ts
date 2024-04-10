@@ -76,20 +76,43 @@ export class PostService {
 }
 
 async getAllPost(
+  
   limit ?:number,
+  searchTerm?: string
 ){
   try{
-    const posts=this.prismaService.post.findMany({
-      take:+limit,
-      orderBy:{
+    let whereClause = {};
+    if (searchTerm) {
+
+      whereClause = {
+        OR: [
+          {
+            caption: {
+              contains: searchTerm
+            }
+          },
+          {
+            tags: {
+              hasSome: [searchTerm]
+            }
+          }
+        ]
+      };
+    }
+
+    const posts = this.prismaService.post.findMany({
+      take: +limit,
+      where: whereClause, 
+      orderBy: {
         created_at: 'desc',
       }, 
-       include: {
+      include: {
         creator: true, 
-        likes:true,
-        saves:true
+        likes: true,
+        saves: true
       },
-    })
+    });
+
     return posts
 
   }catch(error){
