@@ -58,7 +58,7 @@ export class PostService {
     });
     return updatedPost;
   }catch(error){
-    console.log
+    console.log(error)
   }
  }
 

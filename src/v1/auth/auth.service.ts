@@ -75,7 +75,11 @@ export class AuthService {
           user_id: payload.userId,
         },
         include:{
-          saved_posts:true,
+          saved_posts: {
+            include: {
+              post: true // Include the related Post object
+            }
+          },
           liked_posts:true
         }
       });
@@ -90,6 +94,31 @@ export class AuthService {
     } catch (error) {
       console.log(error);
       return null;
+    }
+  }
+
+  async getUserById(userId:string){
+    try{
+      const user = await this.prismaService.user.findUnique({
+        where: {
+          user_id: userId
+        },
+        include:{
+          saved_posts: {
+            include: {
+              post: true // Include the related Post object
+            }
+          },
+          liked_posts:true,
+          posts:true
+        }
+      });
+
+      if (!user) return null;
+      return user
+
+    }catch(error){
+      console.log(error)
     }
   }
 

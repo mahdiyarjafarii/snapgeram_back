@@ -1,7 +1,7 @@
 import { Controller, Get, HttpException, Post,Headers } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserCreateReq, UserForgetPassReq, UserLoginReq, UserResetPassReq } from './dtos/auth.dto';
-import { Body, Req } from '@nestjs/common/decorators';
+import { Body, Query, Req } from '@nestjs/common/decorators';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
 
@@ -58,5 +58,11 @@ export class AuthController {
     return this.authServices.getUserWithToken(authorizationHeader)
   }
 
+  @Get("/")
+  async getUserId(
+    @Query("userId") userId?: string,
+  ){
+    return this.authServices.getUserById(userId)
+  }
 
 }
